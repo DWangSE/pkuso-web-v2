@@ -39,7 +39,7 @@ pnpm verify       # 一键:format → lint → typecheck → test
 ### 认证
 
 全局用户状态在 `src/context/user-context.tsx`;页面访问由 auth-gate 组件把关;登录/注册页在 `src/app/(auth)/`。
-**成员端已 deprecated**:成员无法再从网页端登录(登录路由对非管理员 `is_admin()` 拦截登出并提示使用微信小程序);网页端仅面向管理员。
+**Member 端已完全移除**：网页端仅面向管理员。`(member)/` 下只剩空壳 layout 和引导页（提示用户使用微信小程序）。
 
 ### 地理签到（2026-08 起）
 
@@ -48,19 +48,12 @@ pnpm verify       # 一键:format → lint → typecheck → test
 - `rehearsals.checkin_lat/lng/checkin_radius_m` 三字段全非 NULL 才启用围栏,任一为 NULL = 不限位置;管理端表单以「开启地理围栏」开关显式控制
 - 历史决策:web member 端已废弃,不再为其维护签到功能
 
-### 路由结构（Route Group 分离 Admin/Member）
+### 路由结构
 
 ```
 src/app/
-├── (auth)/           # route group, URL: /login, /signup, /reset-password
-├── (member)/         # route group, URL: /, /schedule, /community, /members, /profile
-│   ├── layout.tsx    # member tab bar（首页/社区/日程/成员/我的）
-│   ├── page.tsx      # 排练日程展示（含历史合排 tab）+ 签到
-│   ├── schedule/     # 排练房预约（甘特图+预约）
-│   │   └── components/  # rehearsal-card, code-verify-modal, leave-request-modal, schedule-gantt 等
-│   ├── community/    # 社区帖子（重奏/团建）
-│   ├── members/      # 全团成员花名册（声部分组+拼音搜索）
-│   └── profile/      # 个人信息+密码修改
+├── (auth)/           # route group, URL: /login, /reset-password
+├── (member)/         # 空壳，仅保留引导页提示用户使用微信小程序
 ├── admin/            # 普通目录, URL: /admin, /admin/rehearsals, /admin/schedule, /admin/members, /admin/community, /admin/profile
 │   ├── layout.tsx    # admin tab bar（控制台/排练/社区/日程/成员/我的）+ 角色鉴权 + 守护页超时刷新
 │   ├── page.tsx      # 仪表盘（入团审批/请假审批/公告,tab 切换）
@@ -75,23 +68,6 @@ src/app/
 └── api/              # API routes（notify, admin/approve, admin/approve-all, admin/reject,
                       #            admin/reject-all, admin/announcement, admin/settings, admin/leave）
 ```
-
-### 开发方式：admin/member 分端独立
-
-项目虽然部署在同一个 Next.js app 中，但 **admin 和 member 已完全分离**，可按两个独立应用对待：
-
-| 维度     | Member 端                                   | Admin 端                             |
-| -------- | ------------------------------------------- | ------------------------------------ |
-| 路由前缀 | `/`                                         | `/admin`                             |
-| 布局     | `(member)/layout.tsx`                       | `admin/layout.tsx`                   |
-| Tab bar  | 首页 · 日程 · 社区 · 我的                   | 控制台 · 排练 · 日程 · 成员 · 我的   |
-| 角色守卫 | 无（AuthGate 统一鉴权）                     | `layout.tsx` 检查 `role === "admin"` |
-| 开发入口 | 新功能加在 `(member)/` 下                   | 新功能加在 `admin/` 下               |
-| 组件     | 各端组件放在各自目录的 `components/` 子目录 | 同                                   |
-| 数据层   | 共享 `src/hooks/` 和 `src/lib/`             | 同                                   |
-| UI 原语  | 共享 `src/components/ui/`                   | 同                                   |
-
-**不再通过 `isAdmin` 条件分支混合 UI**。开发 member 端新功能时不需要关心 admin 代码，反之亦然。唯一共享的部分是 hooks、lib、UI 原语、类型定义。
 
 ### 迁移状态（2026-08）
 
@@ -108,9 +84,9 @@ src/app/
 
 - **Token 优先**: `src/styles/tokens.css` 为设计令牌单一可信源。所有颜色通过 Tailwind 语义类使用,**禁止硬编码调色板色**(`zinc-*`/`text-white` 等——`text-white` 应写 `text-primary-foreground`,暗色模式才不会低对比度)。21 对语义色覆盖亮/暗双模式,完整清单以 tokens.css 为准。
 - **移动端优先**: 页面宽 `max-w-md`(448px),Modal 默认底部弹出(`position="bottom"`),底部安全区 `pb-safe`。
-- **罗列内容必须可滚动**: 页面是固定视口(AuthGate `h-screen` 列 + 两端 layout `flex-1 overflow-hidden`,页面本身不可滚动)。罗列性质的内容必须放可滚动容器(`flex-1 min-h-0 overflow-y-auto` 或 `max-h-[Npx] overflow-y-auto`);含筛选控件的列表页,根容器用 `flex h-full min-h-0 flex-col`,控件+列表整体放滚动区(矮屏可到达)。**豁免:member 端 profile 页整页滚动**——page 根节点自身为 `flex-1 min-h-0 overflow-y-auto` 滚动容器(整页上下滚动、tab bar 固定),其余页面维持固定视口。
+- **罗列内容必须可滚动**: 页面是固定视口(AuthGate `h-screen` 列 + 两端 layout `flex-1 overflow-hidden`,页面本身不可滚动)。罗列性质的内容必须放可滚动容器(`flex-1 min-h-0 overflow-y-auto` 或 `max-h-[Npx] overflow-y-auto`);含筛选控件的列表页,根容器用 `flex h-full min-h-0 flex-col`,控件+列表整体放滚动区(矮屏可到达)。
 - **多行文本框可拉长**: textarea 保持默认可拖拽调整大小(resize: both),除全屏铺满等豁免场景外**不要加 `resize-none`**,且避免 `.input` 固定高度类覆盖 rows。
-- **组件复用**: 写新 UI 前先查 `src/components/ui/`(Modal/Toggle/Card/Toast)和 `src/app/(member)/schedule/components/`(排练相关组件)。Button 暂不统一(35+ 变体,待设计系统定型)。
+- **组件复用**: 写新 UI 前先查 `src/components/ui/`(Modal/Toggle/Card/Toast)。Button 暂不统一(35+ 变体,待设计系统定型)。
 - **暗色模式**: `<html data-theme="dark">` 即可全局切换,所有组件应双模式可用。测试时亮/暗都过一遍。
 - **0 行更新必须检测**: 带状态守卫的 update 要链 `.select("id")`,0 行(RLS 静默失败/并发已处理)时 return false,且**在任何副作用(如删附件)之前检测**。
 - **附件路径提取**: storage 路径从 URL 提取统一用 `indexOf("bucket/")` + `decodeURIComponent`,try/catch 兜底(参考 `usePosts.remove`)。

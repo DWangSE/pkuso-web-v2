@@ -697,6 +697,7 @@ export type Database = {
           expires_at: string
           id: number
           purpose: string
+          session_id: string | null
           target_email: string
           used: boolean | null
           user_id: string
@@ -707,6 +708,7 @@ export type Database = {
           expires_at: string
           id?: never
           purpose: string
+          session_id?: string | null
           target_email: string
           used?: boolean | null
           user_id: string
@@ -717,6 +719,7 @@ export type Database = {
           expires_at?: string
           id?: never
           purpose?: string
+          session_id?: string | null
           target_email?: string
           used?: boolean | null
           user_id?: string
@@ -747,7 +750,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
-          college?: string | null
+          college?: never
           created_at?: string | null
           email?: never
           full_name?: string | null
@@ -759,14 +762,14 @@ export type Database = {
           instrument?: string | null
           is_in_orchestra?: boolean | null
           is_section_leader?: boolean | null
-          join_date?: never
+          join_date?: string | null
           phone_number?: never
           role?: Database["public"]["Enums"]["profileRole"] | null
           status?: Database["public"]["Enums"]["profileStatus"] | null
         }
         Update: {
           avatar_url?: string | null
-          college?: string | null
+          college?: never
           created_at?: string | null
           email?: never
           full_name?: string | null
@@ -778,7 +781,7 @@ export type Database = {
           instrument?: string | null
           is_in_orchestra?: boolean | null
           is_section_leader?: boolean | null
-          join_date?: never
+          join_date?: string | null
           phone_number?: never
           role?: Database["public"]["Enums"]["profileRole"] | null
           status?: Database["public"]["Enums"]["profileStatus"] | null
@@ -796,6 +799,7 @@ export type Database = {
           status: Database["public"]["Enums"]["leaveStatus"]
         }[]
       }
+      check_data_versions: { Args: never; Returns: Json }
       check_email_taken: {
         Args: { p_email: string; p_exclude_user_id: string }
         Returns: boolean
@@ -848,6 +852,7 @@ export type Database = {
           session_token: string
         }[]
       }
+      upload_test_image: { Args: never; Returns: undefined }
       verify_and_use_invitation_code: {
         Args: { p_code: string; p_user_id: string }
         Returns: {
@@ -886,12 +891,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -915,11 +920,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -940,11 +945,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -965,11 +970,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -982,11 +987,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
