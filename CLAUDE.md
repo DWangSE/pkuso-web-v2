@@ -6,6 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 北大交响乐团管理系统(PKUSO)。Next.js 16(App Router)+ React 19 + TypeScript(strict)+ Tailwind CSS v4 + Supabase,部署于 Vercel。界面文案、代码注释、提交信息均为中文。
 
+### 关联项目
+
+- **后端仓库**：`../pkuso-backend`（即 `C:\Users\dddam\Desktop\pkusoweb\pkuso-backend`）— 数据库 schema、Edge Functions、类型定义的唯一事实来源。
+- **小程序端**：`../pkuso-miniprogram`（即 `C:\Users\dddam\Desktop\pkusoweb\pkuso-miniprogram`）— 成员端。
+- 后端仓库的指导文件是其根目录的 `CLAUDE.md`，需要了解后端约定时请阅读该文件。
+
 ## 常用命令
 
 ```bash
@@ -131,7 +137,7 @@ src/app/
   - PowerShell here-string(`@"..."@`)在多行中文场景下更可靠,优于多个 `-m` 拼接 commit message。
   - **bash heredoc（`cat <<'EOF'`）在 PowerShell 中不可用**，会报 "Missing file specification after redirection operator"。多行中文 commit message / PR body 改用文件方式：写入临时文件后 `git commit -F <file>` / `gh pr create --body-file <file>`，完成后删除临时文件。
   - **PowerShell `Select-Object` 在管道输出中文时会出现乱码**,改用 `ForEach-Object` 或直接输出。如需格式化对象输出,使用 `ConvertTo-Json -Depth 10` 或手动拼接字符串。
-- **`supabase/` 文件夹必须保持 git 追踪**：`.gitignore` 中只忽略 `supabase/.temp/`，不忽略 `supabase/migrations/` 等目录。所有 migration 文件、Edge Functions、配置文件都应进入版本控制，确保 schema 变更可追溯、可回滚。
+- **`supabase/` 文件夹**：migrations 和 Edge Functions 已迁移至 `pkuso-backend` 仓库。本仓库保留 `.mcp.json` 用于 MCP 连接。所有后端变更必须提交到 `pkuso-backend` 仓库。
 - 历代功能 spec(颜色系统、admin/member 拆分、hooks-modal 重构、排练房预订等)已迁移至项目 wiki。
 - 经验沉淀机制:项目级约定写进本文件;可复用操作流程写成 `.claude/skills/<名字>/SKILL.md`;会话中的偏好与决策背景由 Claude 记入其持久 memory。会话结束前可用 `.claude/skills/save-lesson` 的流程做沉淀。
 
@@ -173,7 +179,7 @@ SMTP 测试用 Mailpit 替代 Ethereal（Ethereal 公网 SMTP 在北大校园网
 
 ### gen-types
 
-`pnpm gen-types` 需 Supabase CLI 已 link。CI 通过 `SUPABASE_ACCESS_TOKEN` + `SUPABASE_PROJECT_REF` secrets 动态 link。
+类型定义由 `pkuso-backend` 仓库统一生成。运行 `pnpm pull-types` 从后端仓库获取最新 `database.types.ts`。CI 通过 `pkuso-backend` 的 workflow 自动创建 PR 同步类型。
 
 ### 级联删除优先使用外键约束
 
