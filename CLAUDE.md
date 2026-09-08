@@ -387,7 +387,7 @@ const fetchAuthorName = async (scheduleId: string) => {
 | pkuso-reviewer    | **Haiku** | CLAUDE.md 合规审查（命名/颜色 Token/架构/编码规范）           | Read/Glob/Grep/Bash（只读，不修代码）                        |
 | pkuso-adversary   | Sonnet    | 找 Bug/逻辑漏洞/边界情况（reviewer PASS 后调用）              | Read/Glob/Grep/Bash（只读，不修代码）                        |
 | pkuso-tester      | Sonnet    | 测试补齐与回归（adversary 未击破后调用）                      | Read/Write/Edit/Glob/Grep/Bash/Task                          |
-| pkuso-dba         | Sonnet    | 数据库变更（schema/RLS/枚举/migration，唯一可产出 migration） | + Supabase MCP tools                                         |
+| pkuso-dba         | Sonnet    | 数据库变更（schema/RLS/枚举/migration，唯一可产出 migration） | + Supabase MCP tools（只读，用于查询和分析）                 |
 
 **模型选择理由**：reviewer 是纯机械性规则匹配（grep 文件名/颜色/import），不需要推理能力，Haiku 比 Sonnet 便宜 ~10 倍。其余 agent 都需要理解代码语义、做判断或生成内容，必须 Sonnet。
 
