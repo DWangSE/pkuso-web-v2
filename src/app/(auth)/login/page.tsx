@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
@@ -55,8 +54,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="rounded-3xl border border-border bg-surface p-5 shadow-sm">
           <div className="mb-4 text-center">
-            <h1 className="text-xl font-semibold text-text">登录</h1>
-            <p className="mt-1 text-xs text-text-muted">登录后进入乐团系统</p>
+            <h1 className="text-xl font-semibold text-text">管理端登录</h1>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-3">
@@ -88,11 +86,6 @@ export default function LoginPage() {
                 placeholder="请输入密码"
                 autoComplete="current-password"
               />
-              <div className="text-right">
-                <Link href="/reset-password" className="text-xs text-text-muted hover:text-text">
-                  忘记密码？
-                </Link>
-              </div>
             </div>
 
             {errorMsg ? (
@@ -109,10 +102,6 @@ export default function LoginPage() {
               {submitting ? "登录中…" : "登录"}
             </button>
           </form>
-
-          <div className="mt-4 text-center text-xs text-text-muted">
-            成员端已迁移至微信小程序，请使用管理员账号登录。
-          </div>
         </div>
       </div>
     </div>
