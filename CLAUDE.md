@@ -155,7 +155,7 @@ src/app/
   - PowerShell here-string(`@"..."@`)在多行中文场景下更可靠,优于多个 `-m` 拼接 commit message。
   - **bash heredoc（`cat <<'EOF'`）在 PowerShell 中不可用**，会报 "Missing file specification after redirection operator"。多行中文 commit message / PR body 改用文件方式：写入临时文件后 `git commit -F <file>` / `gh pr create --body-file <file>`，完成后删除临时文件。
   - **PowerShell `Select-Object` 在管道输出中文时会出现乱码**,改用 `ForEach-Object` 或直接输出。如需格式化对象输出,使用 `ConvertTo-Json -Depth 10` 或手动拼接字符串。
-- **`supabase/` 文件夹必须保持 git 追踪**：`.gitignore` 中只忽略 `supabase/.temp/`，不忽略 `supabase/migrations/` 等目录。所有 migration 文件、Edge Functions、配置文件都应进入版本控制，确保 schema 变更可追溯、可回滚。
+- **`supabase/` 文件夹保持 git 追踪**：该目录包含历史迁移文件，供参考和审计。**新迁移不要添加到这里**——所有新 schema 变更必须提交到 `pkuso-backend` 仓库。
 - 历代功能 spec(颜色系统、admin/member 拆分、hooks-modal 重构、排练房预订等)已迁移至项目 wiki。
 - 经验沉淀机制:项目级约定写进本文件;可复用操作流程写成 `.claude/skills/<名字>/SKILL.md`;会话中的偏好与决策背景由 Claude 记入其持久 memory。会话结束前可用 `.claude/skills/save-lesson` 的流程做沉淀。
 
@@ -183,6 +183,35 @@ SMTP 测试用 Mailpit 替代 Ethereal（Ethereal 公网 SMTP 在北大校园网
 - **端到端**（1 个）：临时 admin → POST /api/notify → Mailpit API 验证 → 清理
 
 需 `NEXT_PUBLIC_SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`，缺则跳过。
+
+## ⚠️ 后端修改流程
+
+**禁止在 web 仓库中直接修改数据库 schema、RLS 策略或 Edge Functions。**
+
+所有后端变更（DDL / RLS / 函数 / 触发器 / Edge Functions）必须提交到 `pkuso-backend` 仓库（`https://github.com/PKUSO-WebApp/pkuso-backend`）。
+
+- 发现后端问题 → 在 `pkuso-backend` 仓库创建 Issue
+- 需要新表/列/函数 → 在 `pkuso-backend` 创建 PR
+- 紧急修复 → 参考 `pkuso-backend/CLAUDE.md` 的 MCP 审计流程
+
+### 类型同步
+
+- `src/types/database.types.ts` 由 `pkuso-backend` 仓库 CI 自动生成
+- CI 检测到类型变更后会自动创建 PR 同步到本仓库 `dev` 分支
+- 合并该 PR 后前端 CI 即可正常通过类型检查
+- **不要手动编辑** `src/types/database.types.ts`，它始终由后端 CI 管理
+
+### 三个仓库的职责划分
+
+| 仓库            | 职责                                               | 事实来源                |
+| --------------- | -------------------------------------------------- | ----------------------- |
+| `pkuso-backend` | 数据库 schema、Edge Functions、TypeScript 类型定义 | **唯一后端事实来源**    |
+| `pkuso-mp`      | 微信小程序（成员端）                               | 消费 backend 产生的类型 |
+| `pkuso-web`     | 管理端 Web 应用                                    | 消费 backend 产生的类型 |
+
+### MCP 操作审计
+
+通过 MCP 执行的任何数据库操作必须遵守 `pkuso-backend/CLAUDE.md` 的审计规则。
 
 ## 数据库操作注意事项
 

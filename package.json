@@ -18,6 +18,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "gen-types": "supabase gen types typescript --linked --schema public > src/types/database.types.ts",
+    "pull-types": "bash scripts/pull-types.sh",
     "verify": "pnpm format && pnpm lint && pnpm typecheck && pnpm test",
     "prepare": "husky"
   },
