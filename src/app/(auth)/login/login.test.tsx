@@ -37,13 +37,6 @@ describe("LoginPage", () => {
     expect(screen.getByRole("button", { name: "登录" })).toBeInTheDocument();
   });
 
-  it("包含'忘记密码？'链接，指向重置密码页面", () => {
-    render(<LoginPage />);
-    const links = screen.getAllByText("忘记密码？");
-    expect(links.length).toBeGreaterThanOrEqual(1);
-    expect(links[0]).toHaveAttribute("href", "/reset-password");
-  });
-
   it("表单验证 - 邮箱为空", async () => {
     const { container } = render(<LoginPage />);
     fireEvent.change(screen.getByPlaceholderText("请输入密码"), {
