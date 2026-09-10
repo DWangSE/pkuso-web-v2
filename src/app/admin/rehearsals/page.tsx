@@ -54,9 +54,6 @@ export default function AdminRehearsalsPage() {
           <h1 className="text-lg font-semibold text-text">
             {currentType === "历史合排" ? "历史合排" : "排练管理"}
           </h1>
-          <p className="mt-1 text-xs text-text-muted">
-            {currentType === "历史合排" ? "查看已结束的合排排练" : "发布、编辑、查看排练详情"}
-          </p>
         </div>
         {/* 历史合排 tab 不提供发布入口 */}
         {currentType !== "历史合排" && (

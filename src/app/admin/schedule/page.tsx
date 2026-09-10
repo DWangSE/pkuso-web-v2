@@ -375,7 +375,6 @@ export default function AdminSchedulePage() {
         <>
           <div className="mt-4 mb-4">
             <h1 className="text-lg font-semibold text-text">日程管理</h1>
-            <p className="text-sm text-text-muted">管理排练房预约（管理员）</p>
           </div>
 
           <div className="mb-4">

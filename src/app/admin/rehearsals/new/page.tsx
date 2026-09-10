@@ -200,7 +200,6 @@ export default function AdminCreateRehearsalPage() {
         </button>
         <div>
           <h1 className="text-lg font-semibold text-text">发布排练日程</h1>
-          <p className="mt-1 text-xs text-text-muted">发布、编辑、查看排练详情</p>
         </div>
       </header>
 

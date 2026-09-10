@@ -296,7 +296,6 @@ export default function MembersPage() {
       <header className="mt-1 flex items-start justify-between">
         <div>
           <h1 className="text-lg font-semibold text-text">成员</h1>
-          <p className="mt-1 text-xs text-text-muted">排练考勤与乐团花名册</p>
         </div>
         <div className="flex items-center gap-2">
           <button
