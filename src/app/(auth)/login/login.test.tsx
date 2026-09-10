@@ -10,8 +10,13 @@ vi.mock("@/lib/supabase", () => ({
     auth: {
       signInWithPassword: vi.fn().mockResolvedValue({ error: null }),
       signOut: vi.fn().mockResolvedValue({}),
+      getUser: vi.fn().mockResolvedValue({ data: { user: { id: "test-user-id" } }, error: null }),
     },
-    rpc: vi.fn().mockResolvedValue({ data: true, error: null }),
+    from: vi.fn(() => ({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: { role: "admin" }, error: null }),
+    })),
   },
 }));
 
@@ -131,9 +136,13 @@ describe("LoginPage", () => {
     });
   });
 
-  it("成员（非管理员）登录被拦截并提示使用小程序", async () => {
+  it("成员（非管理员）登录被拦截", async () => {
     (supabase.auth.signInWithPassword as Mock).mockResolvedValue({ error: null });
-    (supabase.rpc as Mock).mockResolvedValue({ data: false, error: null });
+    (supabase.from as Mock).mockReturnValue({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: { role: "member" }, error: null }),
+    });
 
     const { container } = render(<LoginPage />);
     fireEvent.change(screen.getByPlaceholderText("name@example.com"), {
@@ -146,14 +155,18 @@ describe("LoginPage", () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(screen.getByText(/成员端已迁移至微信小程序/)).toBeInTheDocument();
+      expect(screen.getByText("成员不允许进行web端登录")).toBeInTheDocument();
     });
     expect(supabase.auth.signOut).toHaveBeenCalled();
   });
 
-  it("is_admin 调用出错时同样拦截并登出", async () => {
+  it("profile 查询出错时同样拦截并登出", async () => {
     (supabase.auth.signInWithPassword as Mock).mockResolvedValue({ error: null });
-    (supabase.rpc as Mock).mockResolvedValue({ data: null, error: { message: "boom" } });
+    (supabase.from as Mock).mockReturnValue({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: null, error: { message: "boom" } }),
+    });
 
     const { container } = render(<LoginPage />);
     fireEvent.change(screen.getByPlaceholderText("name@example.com"), {
@@ -166,7 +179,7 @@ describe("LoginPage", () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(screen.getByText(/成员端已迁移至微信小程序/)).toBeInTheDocument();
+      expect(screen.getByText("成员不允许进行web端登录")).toBeInTheDocument();
     });
     expect(supabase.auth.signOut).toHaveBeenCalled();
   });
