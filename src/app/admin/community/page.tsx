@@ -42,7 +42,6 @@ export default function AdminCommunityPage() {
     <div className="flex h-full min-h-0 flex-col space-y-4">
       <header className="mb-2">
         <h1 className="text-lg font-semibold text-text">社区管理</h1>
-        <p className="mt-1 text-xs text-text-muted">查看、锁定重奏与团建公告</p>
       </header>
 
       <Toggle

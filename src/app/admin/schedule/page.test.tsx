@@ -131,8 +131,6 @@ describe("AdminSchedulePage 组件", () => {
       render(<AdminSchedulePage />);
       expect(screen.getByText("日程管理")).toBeInTheDocument();
       expect(screen.getByText("添加预约")).toBeInTheDocument();
-      // 未放大时显示完整标题和日期选择器
-      expect(screen.getByText(/管理排练房预约/)).toBeInTheDocument();
     });
 
     it("点击放大按钮后应切换到全屏模式", () => {

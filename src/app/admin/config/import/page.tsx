@@ -280,7 +280,6 @@ export default function ImportConfigPage() {
         </button>
         <div>
           <h1 className="text-lg font-semibold text-text">导入配置</h1>
-          <p className="text-xs text-text-muted">配置团员信息导入的字段映射和声部映射</p>
         </div>
       </header>
 
